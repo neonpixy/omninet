@@ -1,0 +1,46 @@
+[package]
+name = "sentinal"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+# Authenticated encryption (AES-256-GCM)
+aes-gcm = { version = "0.10", default-features = false, features = ["aes", "alloc"] }
+
+# Password-based key derivation (PBKDF2-HMAC-SHA256)
+pbkdf2 = { version = "0.12", default-features = false, features = ["hmac"] }
+
+# Key derivation function (HKDF-SHA256)
+hkdf = { version = "0.12", default-features = false }
+
+# Hashing (SHA-256)
+sha2 = { version = "0.10", default-features = false }
+
+# Keyed hashing (HMAC-SHA256)
+hmac = { version = "0.12", default-features = false }
+
+# X25519 Diffie-Hellman key exchange (for PublicKeySlot)
+x25519-dalek = { version = "2", default-features = false, features = [
+    "static_secrets", "getrandom", "zeroize",
+] }
+
+# Memory zeroing
+zeroize = { version = "1", default-features = false, features = ["derive"] }
+
+# BIP-39 mnemonic recovery phrases
+bip39 = { version = "2", default-features = false, features = ["alloc", "zeroize"] }
+
+# Cryptographic randomness
+getrandom = { version = "0.3" }
+
+# Constant-time comparison
+subtle = { version = "2", default-features = false }
+
+# Serialization (following existing workspace patterns)
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+uuid = { version = "1", features = ["v4", "serde"] }
+log = "0.4"

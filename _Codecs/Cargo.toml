@@ -1,0 +1,15 @@
+[package]
+name = "codecs"
+version.workspace = true
+edition.workspace = true
+
+[features]
+default = []
+opus = ["dep:audiopus"]
+
+[dependencies]
+# Opus codec (feature-gated — requires libopus on the system)
+audiopus = { version = "0.2", optional = true }
+
+# Always available
+thiserror = "2"

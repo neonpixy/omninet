@@ -1,0 +1,27 @@
+[package]
+name = "fortune"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+# Internal Omnidea crates
+x = { path = "../X" }
+ideas = { path = "../Ideas" }
+crown = { path = "../Crown" }
+
+# Serialization (workspace standard)
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Error handling
+thiserror = "2"
+
+# Common types
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", default-features = false, features = ["serde", "clock"] }
+log = "0.4"
+
+# Random for serial generation
+getrandom = "0.3"

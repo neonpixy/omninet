@@ -1,0 +1,33 @@
+[package]
+name = "nexus"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+x = { path = "../X" }
+ideas = { path = "../Ideas" }
+magic = { path = "../Magic" }
+equipment = { path = "../Equipment" }
+regalia = { path = "../Regalia" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", default-features = false, features = ["serde", "clock"] }
+log = "0.4"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
+# printpdf/lopdf moved to target-specific deps (excluded on iOS — azul-core doesn't compile)
+rust_xlsxwriter = "0.82"
+calamine = "0.26"
+csv = "1"
+pulldown-cmark = "0.12"
+roxmltree = "0.20"
+quick-xml = { version = "0.37", features = ["serialize"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }
+
+# PDF deps excluded on iOS (azul-core, pulled in by printpdf, doesn't compile for iOS)
+[target.'cfg(not(target_os = "ios"))'.dependencies]
+printpdf = "0.8"
+lopdf = "0.34"

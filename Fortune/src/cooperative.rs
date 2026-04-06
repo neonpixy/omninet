@@ -1,0 +1,246 @@
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+
+/// A worker-owned cooperative enterprise.
+///
+/// From Conjunction Art. 7 §6: "Communities shall organize labor through
+/// reciprocity, not hierarchy. This includes cooperatives governed by those
+/// who work within them."
+///
+/// From Consortium Art. 4 §1: "All property, tools, knowledge, and value
+/// produced by or essential to a Consortium's functioning shall be held
+/// in collective ownership or lawful stewardship."
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct Cooperative {
+    pub id: Uuid,
+    pub name: String,
+    pub charter_id: Option<Uuid>,
+    pub members: Vec<CooperativeMember>,
+    pub treasury_balance: i64,
+    pub surplus_model: SurplusDistribution,
+    pub status: CooperativeStatus,
+    pub created_at: DateTime<Utc>,
+}
+
+impl Cooperative {
+    /// Create a new cooperative with the given name and surplus distribution model.
+    pub fn new(name: impl Into<String>, surplus_model: SurplusDistribution) -> Self {
+        Self {
+            id: Uuid::new_v4(),
+            name: name.into(),
+            charter_id: None,
+            members: Vec::new(),
+            treasury_balance: 0,
+            surplus_model,
+            status: CooperativeStatus::Active,
+            created_at: Utc::now(),
+        }
+    }
+
+    /// Add a new member to the cooperative. Errors if already a member.
+    pub fn add_member(&mut self, member: CooperativeMember) -> Result<(), crate::FortuneError> {
+        if self.is_member(&member.pubkey) {
+            return Err(crate::FortuneError::CooperativeNotFound(
+                "already a member".into(),
+            ));
+        }
+        self.members.push(member);
+        Ok(())
+    }
+
+    /// Check if a person is a member of this cooperative.
+    pub fn is_member(&self, pubkey: &str) -> bool {
+        self.members.iter().any(|m| m.pubkey == pubkey)
+    }
+
+    /// Number of members in this cooperative.
+    pub fn member_count(&self) -> usize {
+        self.members.len()
+    }
+
+    /// Calculate surplus distribution based on the cooperative's model.
+    pub fn distribute_surplus(&self, surplus: i64) -> Vec<(String, i64)> {
+        if self.members.is_empty() || surplus <= 0 {
+            return Vec::new();
+        }
+
+        match &self.surplus_model {
+            SurplusDistribution::Equal => {
+                let share = surplus / self.members.len() as i64;
+                self.members
+                    .iter()
+                    .map(|m| (m.pubkey.clone(), share))
+                    .collect()
+            }
+            SurplusDistribution::ProportionalToContribution => {
+                let total_contribution: i64 =
+                    self.members.iter().map(|m| m.contribution_score).sum();
+                if total_contribution == 0 {
+                    return self.distribute_surplus_equal(surplus);
+                }
+                self.members
+                    .iter()
+                    .map(|m| {
+                        let share =
+                            (surplus as f64 * m.contribution_score as f64 / total_contribution as f64)
+                                .round() as i64;
+                        (m.pubkey.clone(), share)
+                    })
+                    .collect()
+            }
+            SurplusDistribution::NeedsAdjusted => {
+                // Inverse of balance — those with less get more
+                let total_inverse: f64 = self
+                    .members
+                    .iter()
+                    .map(|m| 1.0 / (m.contribution_score.max(1) as f64))
+                    .sum();
+                self.members
+                    .iter()
+                    .map(|m| {
+                        let weight = 1.0 / (m.contribution_score.max(1) as f64);
+                        let share = (surplus as f64 * weight / total_inverse).round() as i64;
+                        (m.pubkey.clone(), share)
+                    })
+                    .collect()
+            }
+            SurplusDistribution::CustomFormula(formula) => {
+                // Custom formulas are strings — actual evaluation deferred to runtime
+                // For now, fall back to equal
+                let _ = formula;
+                self.distribute_surplus_equal(surplus)
+            }
+        }
+    }
+
+    fn distribute_surplus_equal(&self, surplus: i64) -> Vec<(String, i64)> {
+        let share = surplus / self.members.len() as i64;
+        self.members
+            .iter()
+            .map(|m| (m.pubkey.clone(), share))
+            .collect()
+    }
+}
+
+/// A member of a cooperative.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct CooperativeMember {
+    pub pubkey: String,
+    pub role: Option<String>,
+    pub contribution_score: i64,
+    pub joined_at: DateTime<Utc>,
+}
+
+/// How surplus is distributed among members.
+///
+/// From Consortium Art. 2 §3: "Surplus generated by a Consortium shall be
+/// reinvested in the Commons or equitably distributed among its contributors."
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum SurplusDistribution {
+    /// Every member gets an equal share.
+    Equal,
+    /// Share is proportional to each member's contribution score.
+    ProportionalToContribution,
+    /// Inverse of contribution — those with less get more.
+    NeedsAdjusted,
+    /// Custom formula string evaluated at runtime.
+    CustomFormula(String),
+}
+
+/// Lifecycle of a cooperative.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
+pub enum CooperativeStatus {
+    /// Operating and accepting members.
+    Active,
+    /// Inactive but not formally dissolved.
+    Dormant,
+    /// Formally dissolved — no longer operating.
+    Dissolved,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_members() -> Vec<CooperativeMember> {
+        vec![
+            CooperativeMember {
+                pubkey: "alice".into(),
+                role: Some("coordinator".into()),
+                contribution_score: 100,
+                joined_at: Utc::now(),
+            },
+            CooperativeMember {
+                pubkey: "bob".into(),
+                role: None,
+                contribution_score: 50,
+                joined_at: Utc::now(),
+            },
+            CooperativeMember {
+                pubkey: "charlie".into(),
+                role: None,
+                contribution_score: 50,
+                joined_at: Utc::now(),
+            },
+        ]
+    }
+
+    #[test]
+    fn equal_distribution() {
+        let mut coop = Cooperative::new("Test", SurplusDistribution::Equal);
+        for m in test_members() {
+            coop.add_member(m).unwrap();
+        }
+        let dist = coop.distribute_surplus(300);
+        assert_eq!(dist.len(), 3);
+        assert!(dist.iter().all(|(_, share)| *share == 100));
+    }
+
+    #[test]
+    fn proportional_distribution() {
+        let mut coop = Cooperative::new("Test", SurplusDistribution::ProportionalToContribution);
+        for m in test_members() {
+            coop.add_member(m).unwrap();
+        }
+        // Total contribution: 100+50+50 = 200
+        // Alice: 100/200 * 200 = 100
+        // Bob: 50/200 * 200 = 50
+        // Charlie: 50/200 * 200 = 50
+        let dist = coop.distribute_surplus(200);
+        let alice_share = dist.iter().find(|(p, _)| p == "alice").unwrap().1;
+        let bob_share = dist.iter().find(|(p, _)| p == "bob").unwrap().1;
+        assert_eq!(alice_share, 100);
+        assert_eq!(bob_share, 50);
+    }
+
+    #[test]
+    fn needs_adjusted_distribution() {
+        let mut coop = Cooperative::new("Test", SurplusDistribution::NeedsAdjusted);
+        for m in test_members() {
+            coop.add_member(m).unwrap();
+        }
+        let dist = coop.distribute_surplus(200);
+        let alice_share = dist.iter().find(|(p, _)| p == "alice").unwrap().1;
+        let bob_share = dist.iter().find(|(p, _)| p == "bob").unwrap().1;
+        // Bob (lower contribution) should get more than alice
+        assert!(bob_share > alice_share);
+    }
+
+    #[test]
+    fn zero_surplus_no_distribution() {
+        let mut coop = Cooperative::new("Test", SurplusDistribution::Equal);
+        for m in test_members() {
+            coop.add_member(m).unwrap();
+        }
+        let dist = coop.distribute_surplus(0);
+        assert!(dist.is_empty());
+    }
+
+    #[test]
+    fn no_members_no_distribution() {
+        let coop = Cooperative::new("Empty", SurplusDistribution::Equal);
+        let dist = coop.distribute_surplus(1000);
+        assert!(dist.is_empty());
+    }
+}

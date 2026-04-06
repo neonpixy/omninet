@@ -1,0 +1,40 @@
+[package]
+name = "lingo"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+# Internal — Sentinal only (for SeededRandom + vocabulary seed derivation)
+sentinal = { path = "../Sentinal" }
+
+# Serialization (workspace standard)
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Error handling
+thiserror = "2"
+
+# Common types
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", default-features = false, features = ["serde", "clock"] }
+log = "0.4"
+
+# BIP-39 word lists (20K+ common words across 10 languages)
+bip39 = { version = "2", default-features = false, features = [
+    "alloc",
+    "spanish", "french", "italian", "portuguese", "czech",
+    "japanese", "korean", "chinese-simplified", "chinese-traditional",
+] }
+
+# Hashing (nonce seed derivation, byte encoding)
+sha2 = "0.10"
+
+# Cryptographic randomness (nonce generation, homophone selection)
+getrandom = "0.3"
+
+# Omnilingual tokenization
+unicode-segmentation = "1"
+
+[dev-dependencies]

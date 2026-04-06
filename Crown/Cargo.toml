@@ -1,0 +1,42 @@
+[package]
+name = "crown"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+# Memory safety — zeroize private keys on drop
+zeroize = { version = "1", features = ["derive"] }
+
+# BIP-340 Schnorr (secp256k1)
+secp256k1 = { version = "0.29", features = ["rand-std", "serde", "global-context"] }
+
+# Bech32 for cpub/csec (Omnidea convention)
+bech32 = "0.11"
+
+# Key generation
+rand = "0.8"
+
+# SHA-256 for Schnorr message digests
+sha2 = "0.10"
+
+# HKDF for deterministic key derivation (pubkey blinding)
+hkdf = "0.12"
+
+# Serialization (workspace standard)
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Error handling
+thiserror = "2"
+
+# Common types
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", default-features = false, features = ["serde", "clock"] }
+log = "0.4"
+hex = "0.4"
+base64 = "0.22"
+
+[dev-dependencies]
+tempfile = "3"

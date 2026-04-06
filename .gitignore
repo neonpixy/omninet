@@ -1,0 +1,36 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Editors
+*.swp
+*.swo
+.vscode/
+
+# Environment / secrets
+.env
+.env.*
+.npmrc
+
+# Swift
+.build/
+.swiftpm/
+DerivedData/
+*.xcuserdata/
+xcuserdata/
+
+# Rust
+Target/
+Cargo.lock
+
+# Build artifacts
+Divinity/Desktop/build/
+
+# Claude Code
+.claude/
+
+# Internal docs (not published)
+_Plans/
+_SDK/
+docs/*
+!docs/ARCHITECTURE.md

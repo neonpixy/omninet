@@ -1,0 +1,5 @@
+module COmnideaFFI {
+    header "include/divinity_ffi.h"
+    link "divinity_ffi"
+    export *
+}

@@ -1,0 +1,77 @@
+[package]
+name = "divinity-ffi"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+# Spine
+equipment = { path = "../../Equipment" }
+ideas = { path = "../../Ideas" }
+x = { path = "../../X" }
+
+# Vault
+sentinal = { path = "../../Sentinal" }
+vault = { path = "../../Vault" }
+hall = { path = "../../Hall" }
+
+# Identity
+crown = { path = "../../Crown" }
+globe = { path = "../../Globe" }
+lingo = { path = "../../Lingo" }
+
+# Civilization
+polity = { path = "../../Polity" }
+kingdom = { path = "../../Kingdom" }
+fortune = { path = "../../Fortune" }
+bulwark = { path = "../../Bulwark" }
+jail = { path = "../../Jail" }
+yoke = { path = "../../Yoke" }
+
+# Mind
+regalia = { path = "../../Regalia" }
+magic = { path = "../../Magic" }
+advisor = { path = "../../Advisor" }
+oracle = { path = "../../Oracle" }
+
+# Engagement
+quest = { path = "../../Quest" }
+
+# Federation
+nexus = { path = "../../Nexus" }
+
+# Discovery
+zeitgeist = { path = "../../Zeitgeist" }
+magical-index = { path = "../../World/Digital/MagicalIndex" }
+
+# Undercroft
+undercroft = { path = "../../Undercroft" }
+app-catalog = { path = "../../Undercroft/AppCatalog" }
+device-manager = { path = "../../Undercroft/DeviceManager" }
+
+# World — Network
+omnibus = { path = "../../World/Digital/Omnibus" }
+
+# World — Physical
+physical = { path = "../../World/Physical" }
+
+# Memory safety
+zeroize = "1"
+
+# Shared deps
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4"] }
+log = "0.4"
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros"] }
+tempfile = "3"
+chrono = { version = "0.4", features = ["serde"] }
+hex = "0.4"
+url = "2"
+
+[build-dependencies]
+cbindgen = "0.27"

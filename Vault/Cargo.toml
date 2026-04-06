@@ -1,0 +1,32 @@
+[package]
+name = "vault"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+# Omnidea crates
+sentinal = { path = "../Sentinal" }
+ideas = { path = "../Ideas" }
+
+# Encrypted SQLite
+rusqlite = { version = "0.38", features = ["bundled-sqlcipher"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Error handling
+thiserror = "2"
+
+# Common types
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", default-features = false, features = ["serde", "clock"] }
+log = "0.4"
+
+# Hex encoding for SQLCipher passphrase
+hex = "0.4"
+
+[dev-dependencies]
+tempfile = "3"

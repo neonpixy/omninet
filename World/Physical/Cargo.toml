@@ -1,0 +1,15 @@
+[package]
+name = "physical"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+x = { path = "../../X" }
+crown = { path = "../../Crown" }
+bulwark = { path = "../../Bulwark" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", default-features = false, features = ["serde", "clock"] }
+log = "0.4"

@@ -1,0 +1,52 @@
+[package]
+name = "omnidea-tests"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+# This crate exists only for cross-crate integration tests.
+# It has no library — only test binaries.
+
+[dependencies]
+# Identity
+crown = { path = "../Crown" }
+globe = { path = "../Globe" }
+lingo = { path = "../Lingo" }
+ideas = { path = "../Ideas" }
+sentinal = { path = "../Sentinal" }
+x = { path = "../X" }
+
+# Civilization
+polity = { path = "../Polity" }
+kingdom = { path = "../Kingdom" }
+fortune = { path = "../Fortune" }
+bulwark = { path = "../Bulwark" }
+jail = { path = "../Jail" }
+
+# Tower (integration tests)
+tower_crate = { path = "../World/Digital/Tower", package = "tower" }
+magical-index = { path = "../World/Digital/MagicalIndex" }
+
+# Chrono for timestamp manipulation
+chrono = "0.4"
+
+# URL parsing
+url = "2"
+
+# Logging
+log = "0.4"
+env_logger = "0.11"
+
+# Async runtime (Globe is async)
+tokio = { version = "1", features = ["full", "test-util"] }
+tokio-tungstenite = { version = "0.28" }
+futures-util = { version = "0.3", default-features = false, features = ["sink"] }
+
+# Serialization
+serde_json = "1"
+
+# Common
+uuid = { version = "1", features = ["v4"] }
+sha2 = "0.10"

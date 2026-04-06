@@ -1,0 +1,48 @@
+[workspace]
+members = [
+    # A-Z Building Blocks
+    "X",
+    "Ideas",
+    "Equipment",
+    "Sentinal",
+    "Vault",
+    "Hall",
+    "Crown",
+    "Globe",
+    "Lingo",
+    "Polity",
+    "Kingdom",
+    "Fortune",
+    "Bulwark",
+    "Jail",
+    "Regalia",
+    "Magic",
+    "Nexus",
+    "Advisor",
+    "Yoke",
+    "Zeitgeist",
+    "Oracle",
+    "Quest",
+    # World (Network + Physical)
+    "World/Digital/Omnibus",
+    "World/Digital/Tower",
+    "World/Digital/MagicalIndex",
+    "World/Physical",
+    # Divinity (Platform bridges)
+    "Divinity/ffi",
+    "Divinity/Web",
+    # Undercroft (meta-layer)
+    "Undercroft",
+    "Undercroft/AppCatalog",
+    "Undercroft/DeviceManager",
+    # Supporting
+    "_Codecs",
+    "_Tests",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "LicenseRef-Covenant"
